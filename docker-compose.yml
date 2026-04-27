@@ -1,0 +1,71 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    platform: linux/arm64
+    container_name: online_exam_postgres
+    environment:
+      POSTGRES_DB: online_exam
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - online_exam_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      platforms:
+        - linux/arm64
+        - linux/amd64
+    container_name: online_exam_backend
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__DefaultConnection=Host=postgres;Database=online_exam;Username=postgres;Password=postgres
+      - Jwt__Key=YourSuperSecretLongJwtKeyThatIsAtLeast32CharactersLongForSecurity
+      - Jwt__Issuer=OnlineExamSystem
+      - Jwt__Audience=OnlineExamSystemUsers
+      - Jwt__ExpiryInMinutes=120
+      - Cors__AllowedOrigins__0=http://localhost:8080
+      - Cors__AllowedOrigins__1=http://frontend:80
+    ports:
+      - "5000:5000"
+    networks:
+      - online_exam_network
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: on-failure
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      platforms:
+        - linux/arm64
+        - linux/amd64
+    container_name: online_exam_frontend
+    ports:
+      - "8080:80"
+    networks:
+      - online_exam_network
+    depends_on:
+      - backend
+    restart: on-failure
+
+volumes:
+  postgres_data:
+
+networks:
+  online_exam_network:
+    driver: bridge
