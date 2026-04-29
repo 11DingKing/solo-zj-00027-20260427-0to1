@@ -26,8 +26,9 @@ const LoginPage: React.FC = () => {
       });
       message.success('登录成功');
       navigate(values.role === UserRole.TEACHER ? '/teacher/questions' : '/student/exams');
-    } catch (error) {
-      message.error('登录失败，请检查用户名和密码');
+    } catch (error: any) {
+      const errorMessage = error.userMessage || error.response?.data?.message || '登录失败，请检查用户名和密码';
+      message.error(errorMessage);
     } finally {
       setLoading(false);
     }

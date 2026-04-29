@@ -128,16 +128,33 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-using (var scope = app.Services.CreateScope())
-{
-    var services = scope.ServiceProvider;
-    var context = services.GetRequiredService<AppDbContext>();
-    var userManager = services.GetRequiredService<UserManager<User>>();
-    var roleManager = services.GetRequiredService<RoleManager<IdentityRole<int>>>();
-    
-    context.Database.EnsureCreated();
-    
-    await SeedData.InitializeAsync(context, userManager, roleManager);
-}
+await InitializeDatabaseAsync(app);
 
 app.Run("http://0.0.0.0:5000");
+
+async Task InitializeDatabaseAsync(WebApplication app)
+{
+    using var scope = app.Services.CreateScope();
+    var services = scope.ServiceProvider;
+    var logger = services.GetRequiredService<ILogger<Program>>();
+    
+    try
+    {
+        var context = services.GetRequiredService<AppDbContext>();
+        var userManager = services.GetRequiredService<UserManager<User>>();
+        var roleManager = services.GetRequiredService<RoleManager<IdentityRole<int>>>();
+        
+        logger.LogInformation("Starting database initialization...");
+        
+        await context.Database.EnsureCreatedAsync();
+        logger.LogInformation("Database ensured created.");
+        
+        await SeedData.InitializeAsync(context, userManager, roleManager);
+        logger.LogInformation("Seed data initialized successfully.");
+    }
+    catch (Exception ex)
+    {
+        logger.LogError(ex, "An error occurred while initializing the database.");
+        throw;
+    }
+}
