@@ -102,13 +102,15 @@ export const QuestionRenderer: React.FC<QuestionRendererProps> = ({
             value={answer.answer}
             onChange={(e) => onAnswerChange(question.id, e.target.value)}
           >
-            <Space>
-              <div className="option-item" style={{ display: "inline-block" }}>
-                <Radio value="true">正确</Radio>
-              </div>
-              <div className="option-item" style={{ display: "inline-block" }}>
-                <Radio value="false">错误</Radio>
-              </div>
+            <Space direction="vertical" style={{ width: "100%" }}>
+              {options.map((opt, idx) => (
+                <div key={opt.id} className="option-item">
+                  <Radio value={String(opt.id)}>
+                    <Text strong>{String.fromCharCode(65 + idx)}. </Text>
+                    {opt.text}
+                  </Radio>
+                </div>
+              ))}
             </Space>
           </Radio.Group>
         );

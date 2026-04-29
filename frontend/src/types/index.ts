@@ -1,19 +1,19 @@
 export enum UserRole {
-  TEACHER = 'TEACHER',
-  STUDENT = 'STUDENT'
+  TEACHER = "TEACHER",
+  STUDENT = "STUDENT",
 }
 
 export enum QuestionType {
-  SINGLE_CHOICE = 'SINGLE_CHOICE',
-  MULTIPLE_CHOICE = 'MULTIPLE_CHOICE',
-  TRUE_FALSE = 'TRUE_FALSE',
-  FILL_BLANK = 'FILL_BLANK'
+  SINGLE_CHOICE = "SINGLE_CHOICE",
+  MULTIPLE_CHOICE = "MULTIPLE_CHOICE",
+  TRUE_FALSE = "TRUE_FALSE",
+  FILL_BLANK = "FILL_BLANK",
 }
 
 export enum DifficultyLevel {
-  EASY = 'EASY',
-  MEDIUM = 'MEDIUM',
-  HARD = 'HARD'
+  EASY = "EASY",
+  MEDIUM = "MEDIUM",
+  HARD = "HARD",
 }
 
 export interface User {
@@ -50,6 +50,7 @@ export interface ExamQuestion {
   examPaperId: number;
   questionId: number;
   questionOrder: number;
+  score: number;
   question: Question;
 }
 
@@ -76,7 +77,7 @@ export interface ExamSession {
   studentId: number;
   startTime: string;
   endTime?: string;
-  status: 'IN_PROGRESS' | 'SUBMITTED' | 'TIMED_OUT';
+  status: "IN_PROGRESS" | "SUBMITTED" | "TIMED_OUT";
   screenSwitchCount: number;
   examPaper: ExamPaper;
 }

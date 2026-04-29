@@ -39,6 +39,7 @@ public record ExamQuestionDTO(
     int ExamPaperId,
     int QuestionId,
     int QuestionOrder,
+    int Score,
     QuestionDTO Question
 );
 

@@ -216,7 +216,7 @@ public class ExamService : IExamService
 
         var autoScore = 0;
         var questionScores = session.ExamPaper.ExamQuestions
-            .ToDictionary(eq => eq.QuestionId, eq => eq.Question.Score);
+            .ToDictionary(eq => eq.QuestionId, eq => eq.Score);
 
         foreach (var answer in answers)
         {

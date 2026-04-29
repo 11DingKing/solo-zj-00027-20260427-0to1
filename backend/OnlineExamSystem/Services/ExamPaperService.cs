@@ -49,11 +49,13 @@ public class ExamPaperService : IExamPaperService
 
     public async Task<ExamPaperDTO> AutoGeneratePaperAsync(AutoGeneratePaperRequest request, int creatorId)
     {
+        var calculatedTotalScore = request.QuestionRequirements.Sum(r => r.Count * r.ScorePerQuestion);
+        
         var examPaper = new ExamPaper
         {
             Name = request.Name,
             Description = request.Description,
-            TotalScore = request.TotalScore,
+            TotalScore = calculatedTotalScore,
             PassingScore = request.PassingScore,
             Duration = request.Duration,
             ShuffleQuestions = request.ShuffleQuestions,
@@ -92,7 +94,8 @@ public class ExamPaperService : IExamPaperService
                 {
                     ExamPaperId = examPaper.Id,
                     QuestionId = question.Id,
-                    QuestionOrder = questionOrder++
+                    QuestionOrder = questionOrder++,
+                    Score = requirement.ScorePerQuestion
                 });
             }
         }
@@ -132,11 +135,16 @@ public class ExamPaperService : IExamPaperService
         await _context.SaveChangesAsync();
 
         var examQuestions = request.QuestionIds
-            .Select((questionId, index) => new ExamQuestion
+            .Select((questionId, index) => 
             {
-                ExamPaperId = examPaper.Id,
-                QuestionId = questionId,
-                QuestionOrder = index + 1
+                var question = questions.GetValueOrDefault(questionId);
+                return new ExamQuestion
+                {
+                    ExamPaperId = examPaper.Id,
+                    QuestionId = questionId,
+                    QuestionOrder = index + 1,
+                    Score = question?.Score ?? 0
+                };
             })
             .ToList();
 
@@ -202,6 +210,7 @@ public class ExamPaperService : IExamPaperService
                 eq.ExamPaperId,
                 eq.QuestionId,
                 eq.QuestionOrder,
+                eq.Score,
                 eq.Question != null ? new QuestionDTO(
                     eq.Question.Id,
                     eq.Question.Type,
