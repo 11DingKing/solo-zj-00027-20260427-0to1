@@ -9,7 +9,7 @@ import {
   Checkbox,
   Input,
 } from "antd";
-import { QuestionType, ExamQuestion, DifficultyLevel } from "@/types";
+import { QuestionType, ExamQuestion } from "@/types";
 import {
   formatQuestionType,
   formatDifficulty,
@@ -19,14 +19,6 @@ import {
 
 const { Text } = Typography;
 const { TextArea } = Input;
-
-interface AnswerState {
-  [questionId: number]: {
-    answer: string;
-    answered: boolean;
-    marked: boolean;
-  };
-}
 
 interface QuestionRendererProps {
   examQuestion: ExamQuestion;

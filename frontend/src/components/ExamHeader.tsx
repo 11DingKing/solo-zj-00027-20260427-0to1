@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, Button, Tag, Typography, Space, Statistic } from "antd";
+import { Button, Tag, Typography, Space, Statistic } from "antd";
 import { ClockCircleOutlined, SafetyOutlined } from "@ant-design/icons";
 import { formatCountdown } from "@/utils/format";
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   Table,
   Button,
@@ -19,21 +19,27 @@ import {
   Col,
   DatePicker,
   List,
-  Checkbox
-} from 'antd';
+  Checkbox,
+} from "antd";
 import {
   PlusOutlined,
   EditOutlined,
   DeleteOutlined,
   FileTextOutlined,
-  BarChartOutlined
-} from '@ant-design/icons';
-import type { ColumnsType } from 'antd/es/table';
-import dayjs from 'dayjs';
+  BarChartOutlined,
+} from "@ant-design/icons";
+import type { ColumnsType } from "antd/es/table";
+import dayjs from "dayjs";
 
-import { apiService } from '@/services/api';
-import { ExamPaper, Question, QuestionType, DifficultyLevel } from '@/types';
-import { formatQuestionType, formatDifficulty, formatDateTime, formatDuration } from '@/utils/format';
+import { apiService } from "@/services/api";
+import { ExamPaper, Question, QuestionType, DifficultyLevel } from "@/types";
+import {
+  formatQuestionType,
+  formatDifficulty,
+  formatDateTime,
+  formatDuration,
+  getDifficultyColor,
+} from "@/utils/format";
 
 const { Title } = Typography;
 const { TextArea } = Input;
@@ -46,7 +52,7 @@ const ExamPaperManagement: React.FC = () => {
   const [createModalVisible, setCreateModalVisible] = useState(false);
   const [detailModalVisible, setDetailModalVisible] = useState(false);
   const [selectedPaper, setSelectedPaper] = useState<ExamPaper | null>(null);
-  const [createMode, setCreateMode] = useState<'auto' | 'manual'>('auto');
+  const [createMode, setCreateMode] = useState<"auto" | "manual">("auto");
   const [questions, setQuestions] = useState<Question[]>([]);
   const [selectedQuestions, setSelectedQuestions] = useState<number[]>([]);
   const [form] = Form.useForm();
@@ -58,7 +64,7 @@ const ExamPaperManagement: React.FC = () => {
       const result = await apiService.getExamPapers();
       setExamPapers(result);
     } catch (error) {
-      message.error('获取试卷列表失败');
+      message.error("获取试卷列表失败");
     } finally {
       setLoading(false);
     }
@@ -69,7 +75,7 @@ const ExamPaperManagement: React.FC = () => {
       const result = await apiService.getQuestions();
       setQuestions(result.content);
     } catch (error) {
-      message.error('获取题目列表失败');
+      message.error("获取题目列表失败");
     }
   };
 
@@ -86,10 +92,10 @@ const ExamPaperManagement: React.FC = () => {
   const handleDelete = async (id: number) => {
     try {
       await apiService.deleteExamPaper(id);
-      message.success('删除成功');
+      message.success("删除成功");
       fetchExamPapers();
     } catch (error) {
-      message.error('删除失败');
+      message.error("删除失败");
     }
   };
 
@@ -120,16 +126,16 @@ const ExamPaperManagement: React.FC = () => {
         startTime: values.timeRange[0].toISOString(),
         endTime: values.timeRange[1].toISOString(),
         questionRequirements: values.questionRequirements || [],
-        totalScore: values.totalScore
+        totalScore: values.totalScore,
       };
 
       await apiService.autoGeneratePaper(paperData);
-      message.success('试卷创建成功');
+      message.success("试卷创建成功");
       setCreateModalVisible(false);
       fetchExamPapers();
       autoForm.resetFields();
     } catch (error) {
-      message.error('创建试卷失败');
+      message.error("创建试卷失败");
     }
   };
 
@@ -143,7 +149,7 @@ const ExamPaperManagement: React.FC = () => {
     timeRange: [dayjs.Dayjs, dayjs.Dayjs];
   }) => {
     if (selectedQuestions.length === 0) {
-      message.error('请至少选择一道题目');
+      message.error("请至少选择一道题目");
       return;
     }
 
@@ -157,71 +163,72 @@ const ExamPaperManagement: React.FC = () => {
         shuffleOptions: values.shuffleOptions,
         startTime: values.timeRange[0].toISOString(),
         endTime: values.timeRange[1].toISOString(),
-        questionIds: selectedQuestions
+        questionIds: selectedQuestions,
       };
 
       await apiService.createManualPaper(paperData);
-      message.success('试卷创建成功');
+      message.success("试卷创建成功");
       setCreateModalVisible(false);
       fetchExamPapers();
       form.resetFields();
       setSelectedQuestions([]);
     } catch (error) {
-      message.error('创建试卷失败');
+      message.error("创建试卷失败");
     }
   };
 
   const columns: ColumnsType<ExamPaper> = [
     {
-      title: 'ID',
-      dataIndex: 'id',
-      key: 'id',
-      width: 60
+      title: "ID",
+      dataIndex: "id",
+      key: "id",
+      width: 60,
     },
     {
-      title: '试卷名称',
-      dataIndex: 'name',
-      key: 'name'
+      title: "试卷名称",
+      dataIndex: "name",
+      key: "name",
     },
     {
-      title: '总分/及格分',
-      key: 'score',
-      render: (_, record) => `${record.totalScore}分 / ${record.passingScore}分`
+      title: "总分/及格分",
+      key: "score",
+      render: (_, record) =>
+        `${record.totalScore}分 / ${record.passingScore}分`,
     },
     {
-      title: '考试时长',
-      dataIndex: 'duration',
-      key: 'duration',
-      render: (duration: number) => formatDuration(duration)
+      title: "考试时长",
+      dataIndex: "duration",
+      key: "duration",
+      render: (duration: number) => formatDuration(duration),
     },
     {
-      title: '考试时间',
-      key: 'time',
+      title: "考试时间",
+      key: "time",
       render: (_, record) => (
         <div>
           <div>开始: {formatDateTime(record.startTime)}</div>
           <div>结束: {formatDateTime(record.endTime)}</div>
         </div>
-      )
+      ),
     },
     {
-      title: '题目数量',
-      key: 'questionCount',
-      render: (_, record) => `${record.examQuestions?.length || 0} 道`
+      title: "题目数量",
+      key: "questionCount",
+      render: (_, record) => `${record.examQuestions?.length || 0} 道`,
     },
     {
-      title: '设置',
-      key: 'settings',
+      title: "设置",
+      key: "settings",
       render: (_, record) => (
         <Space wrap>
           {record.shuffleQuestions && <Tag color="blue">乱序出题</Tag>}
           {record.shuffleOptions && <Tag color="orange">乱序选项</Tag>}
         </Space>
-      )
+      ),
     },
     {
-      title: '操作',
-      key: 'action',
+      title: "操作",
+      key: "action",
       width: 200,
       render: (_, record) => (
         <Space>
@@ -235,7 +242,7 @@ const ExamPaperManagement: React.FC = () => {
           <Button
             type="link"
             icon={<BarChartOutlined />}
-            onClick={() => window.location.href = '/teacher/statistics'}
+            onClick={() => (window.location.href = "/teacher/statistics")}
           >
             统计
           </Button>
@@ -250,26 +257,35 @@ const ExamPaperManagement: React.FC = () => {
             </Button>
           </Popconfirm>
         </Space>
-      )
-    }
+      ),
+    },
   ];
 
   const totalSelectedScore = selectedQuestions.reduce((sum, id) => {
-    const q = questions.find(q => q.id === id);
+    const q = questions.find((q) => q.id === id);
     return sum + (q?.score || 0);
   }, 0);
 
   return (
     <div>
       <Card>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-          <Title level={4} style={{ margin: 0 }}>试卷管理</Title>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: 16,
+          }}
+        >
+          <Title level={4} style={{ margin: 0 }}>
+            试卷管理
+          </Title>
           <Button
             type="primary"
             icon={<PlusOutlined />}
             onClick={() => {
               setCreateModalVisible(true);
-              setCreateMode('auto');
+              setCreateMode("auto");
             }}
           >
             创建试卷
@@ -285,7 +301,7 @@ const ExamPaperManagement: React.FC = () => {
             pageSize: 10,
             showSizeChanger: true,
             showQuickJumper: true,
-            showTotal: (total) => `共 ${total} 条`
+            showTotal: (total) => `共 ${total} 条`,
           }}
         />
       </Card>
@@ -306,21 +322,21 @@ const ExamPaperManagement: React.FC = () => {
         <div style={{ marginBottom: 16 }}>
           <Button.Group>
             <Button
-              type={createMode === 'auto' ? 'primary' : 'default'}
-              onClick={() => setCreateMode('auto')}
+              type={createMode === "auto" ? "primary" : "default"}
+              onClick={() => setCreateMode("auto")}
             >
               自动组卷
             </Button>
             <Button
-              type={createMode === 'manual' ? 'primary' : 'default'}
-              onClick={() => setCreateMode('manual')}
+              type={createMode === "manual" ? "primary" : "default"}
+              onClick={() => setCreateMode("manual")}
             >
               手动组卷
             </Button>
           </Button.Group>
         </div>
 
-        {createMode === 'auto' ? (
+        {createMode === "auto" ? (
           <Form
             form={autoForm}
             layout="vertical"
@@ -330,7 +346,7 @@ const ExamPaperManagement: React.FC = () => {
               passingScore: 60,
               shuffleQuestions: false,
               shuffleOptions: false,
-              totalScore: 100
+              totalScore: 100,
             }}
           >
             <Row gutter={16}>
@@ -338,7 +354,7 @@ const ExamPaperManagement: React.FC = () => {
                 <Form.Item
                   name="name"
                   label="试卷名称"
-                  rules={[{ required: true, message: '请输入试卷名称' }]}
+                  rules={[{ required: true, message: "请输入试卷名称" }]}
                 >
                   <Input placeholder="例如：2024年春季学期期中考试" />
                 </Form.Item>
@@ -347,17 +363,14 @@ const ExamPaperManagement: React.FC = () => {
                 <Form.Item
                   name="totalScore"
                   label="总分"
-                  rules={[{ required: true, message: '请输入总分' }]}
+                  rules={[{ required: true, message: "请输入总分" }]}
                 >
-                  <InputNumber min={10} max={1000} style={{ width: '100%' }} />
+                  <InputNumber min={10} max={1000} style={{ width: "100%" }} />
                 </Form.Item>
               </Col>
             </Row>
 
-            <Form.Item
-              name="description"
-              label="试卷描述"
-            >
+            <Form.Item name="description" label="试卷描述">
               <TextArea rows={2} placeholder="试卷说明（可选）" />
             </Form.Item>
 
@@ -366,29 +379,29 @@ const ExamPaperManagement: React.FC = () => {
                 <Form.Item
                   name="duration"
                   label="考试时长（分钟）"
-                  rules={[{ required: true, message: '请输入考试时长' }]}
+                  rules={[{ required: true, message: "请输入考试时长" }]}
                 >
-                  <InputNumber min={1} max={480} style={{ width: '100%' }} />
+                  <InputNumber min={1} max={480} style={{ width: "100%" }} />
                 </Form.Item>
               </Col>
               <Col span={8}>
                 <Form.Item
                   name="passingScore"
                   label="及格分数"
-                  rules={[{ required: true, message: '请输入及格分数' }]}
+                  rules={[{ required: true, message: "请输入及格分数" }]}
                 >
-                  <InputNumber min={0} max={1000} style={{ width: '100%' }} />
+                  <InputNumber min={0} max={1000} style={{ width: "100%" }} />
                 </Form.Item>
               </Col>
               <Col span={8}>
                 <Form.Item
                   name="timeRange"
                   label="考试时间范围"
-                  rules={[{ required: true, message: '请选择考试时间' }]}
+                  rules={[{ required: true, message: "请选择考试时间" }]}
                 >
                   <RangePicker
                     showTime
-                    style={{ width: '100%' }}
+                    style={{ width: "100%" }}
                     format="YYYY-MM-DD HH:mm"
                   />
                 </Form.Item>
@@ -422,17 +435,24 @@ const ExamPaperManagement: React.FC = () => {
               {(fields, { add, remove }) => (
                 <>
                   {fields.map(({ key, name, ...restField }) => (
-                    <Row key={key} gutter={16} style={{ marginBottom: 8 }} align="middle">
+                    <Row
+                      key={key}
+                      gutter={16}
+                      style={{ marginBottom: 8 }}
+                      align="middle"
+                    >
                       <Col span={5}>
                         <Form.Item
                           {...restField}
-                          name={[name, 'type']}
+                          name={[name, "type"]}
                           noStyle
-                          rules={[{ required: true, message: '选择题型' }]}
+                          rules={[{ required: true, message: "选择题型" }]}
                         >
-                          <Select placeholder="题型" style={{ width: '100%' }}>
-                            {Object.values(QuestionType).map(type => (
-                              <Option key={type} value={type}>{formatQuestionType(type)}</Option>
+                          <Select placeholder="题型" style={{ width: "100%" }}>
+                            {Object.values(QuestionType).map((type) => (
+                              <Option key={type} value={type}>
+                                {formatQuestionType(type)}
+                              </Option>
                             ))}
                           </Select>
                         </Form.Item>
@@ -440,35 +460,47 @@ const ExamPaperManagement: React.FC = () => {
                       <Col span={5}>
                         <Form.Item
                           {...restField}
-                          name={[name, 'difficulty']}
+                          name={[name, "difficulty"]}
                           noStyle
-                          rules={[{ required: true, message: '选择难度' }]}
+                          rules={[{ required: true, message: "选择难度" }]}
                         >
-                          <Select placeholder="难度" style={{ width: '100%' }}>
-                            {Object.values(DifficultyLevel).map(difficulty => (
-                              <Option key={difficulty} value={difficulty}>{formatDifficulty(difficulty)}</Option>
-                            ))}
+                          <Select placeholder="难度" style={{ width: "100%" }}>
+                            {Object.values(DifficultyLevel).map(
+                              (difficulty) => (
+                                <Option key={difficulty} value={difficulty}>
+                                  {formatDifficulty(difficulty)}
+                                </Option>
+                              ),
+                            )}
                           </Select>
                         </Form.Item>
                       </Col>
                       <Col span={4}>
                         <Form.Item
                           {...restField}
-                          name={[name, 'count']}
+                          name={[name, "count"]}
                           noStyle
-                          rules={[{ required: true, message: '输入数量' }]}
+                          rules={[{ required: true, message: "输入数量" }]}
                         >
-                          <InputNumber min={1} placeholder="题数" style={{ width: '100%' }} />
+                          <InputNumber
+                            min={1}
+                            placeholder="题数"
+                            style={{ width: "100%" }}
+                          />
                         </Form.Item>
                       </Col>
                       <Col span={4}>
                         <Form.Item
                           {...restField}
-                          name={[name, 'scorePerQuestion']}
+                          name={[name, "scorePerQuestion"]}
                           noStyle
-                          rules={[{ required: true, message: '输入分值' }]}
+                          rules={[{ required: true, message: "输入分值" }]}
                         >
-                          <InputNumber min={1} placeholder="每题分值" style={{ width: '100%' }} />
+                          <InputNumber
+                            min={1}
+                            placeholder="每题分值"
+                            style={{ width: "100%" }}
+                          />
                         </Form.Item>
                       </Col>
                       <Col span={4}>
@@ -479,7 +511,12 @@ const ExamPaperManagement: React.FC = () => {
                     </Row>
                   ))}
                   <Form.Item>
-                    <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
+                    <Button
+                      type="dashed"
+                      onClick={() => add()}
+                      block
+                      icon={<PlusOutlined />}
+                    >
                       添加抽题规则
                     </Button>
                   </Form.Item>
@@ -487,10 +524,14 @@ const ExamPaperManagement: React.FC = () => {
               )}
             </Form.List>
 
-            <Form.Item style={{ marginTop: 24, textAlign: 'right' }}>
+            <Form.Item style={{ marginTop: 24, textAlign: "right" }}>
               <Space>
-                <Button onClick={() => setCreateModalVisible(false)}>取消</Button>
-                <Button type="primary" htmlType="submit">创建试卷</Button>
+                <Button onClick={() => setCreateModalVisible(false)}>
+                  取消
+                </Button>
+                <Button type="primary" htmlType="submit">
+                  创建试卷
+                </Button>
               </Space>
             </Form.Item>
           </Form>
@@ -503,7 +544,7 @@ const ExamPaperManagement: React.FC = () => {
               duration: 60,
               passingScore: 60,
               shuffleQuestions: false,
-              shuffleOptions: false
+              shuffleOptions: false,
             }}
           >
             <Row gutter={16}>
@@ -511,7 +552,7 @@ const ExamPaperManagement: React.FC = () => {
                 <Form.Item
                   name="name"
                   label="试卷名称"
-                  rules={[{ required: true, message: '请输入试卷名称' }]}
+                  rules={[{ required: true, message: "请输入试卷名称" }]}
                 >
                   <Input placeholder="例如：2024年春季学期期中考试" />
                 </Form.Item>
@@ -520,21 +561,18 @@ const ExamPaperManagement: React.FC = () => {
                 <Form.Item
                   name="timeRange"
                   label="考试时间范围"
-                  rules={[{ required: true, message: '请选择考试时间' }]}
+                  rules={[{ required: true, message: "请选择考试时间" }]}
                 >
                   <RangePicker
                     showTime
-                    style={{ width: '100%' }}
+                    style={{ width: "100%" }}
                     format="YYYY-MM-DD HH:mm"
                   />
                 </Form.Item>
               </Col>
             </Row>
 
-            <Form.Item
-              name="description"
-              label="试卷描述"
-            >
+            <Form.Item name="description" label="试卷描述">
               <TextArea rows={2} placeholder="试卷说明（可选）" />
             </Form.Item>
 
@@ -543,18 +581,18 @@ const ExamPaperManagement: React.FC = () => {
                 <Form.Item
                   name="duration"
                   label="考试时长（分钟）"
-                  rules={[{ required: true, message: '请输入考试时长' }]}
+                  rules={[{ required: true, message: "请输入考试时长" }]}
                 >
-                  <InputNumber min={1} max={480} style={{ width: '100%' }} />
+                  <InputNumber min={1} max={480} style={{ width: "100%" }} />
                 </Form.Item>
               </Col>
               <Col span={6}>
                 <Form.Item
                   name="passingScore"
                   label="及格分数"
-                  rules={[{ required: true, message: '请输入及格分数' }]}
+                  rules={[{ required: true, message: "请输入及格分数" }]}
                 >
-                  <InputNumber min={0} max={1000} style={{ width: '100%' }} />
+                  <InputNumber min={0} max={1000} style={{ width: "100%" }} />
                 </Form.Item>
               </Col>
               <Col span={6}>
@@ -579,22 +617,32 @@ const ExamPaperManagement: React.FC = () => {
 
             <Divider>
               选择题目
-              <Tag color={selectedQuestions.length > 0 ? 'green' : 'default'}>
-                已选: {selectedQuestions.length} 题, 总分: {totalSelectedScore} 分
+              <Tag color={selectedQuestions.length > 0 ? "green" : "default"}>
+                已选: {selectedQuestions.length} 题, 总分: {totalSelectedScore}{" "}
+                分
               </Tag>
             </Divider>
 
-            <div style={{ maxHeight: 400, overflowY: 'auto' }}>
+            <div style={{ maxHeight: 400, overflowY: "auto" }}>
               <List
                 dataSource={questions}
                 renderItem={(question) => (
                   <List.Item
                     actions={[
                       <Tag key="type">{formatQuestionType(question.type)}</Tag>,
-                      <Tag key="difficulty" color={question.difficulty === DifficultyLevel.EASY ? 'green' : question.difficulty === DifficultyLevel.MEDIUM ? 'orange' : 'red'}>
+                      <Tag
+                        key="difficulty"
+                        color={
+                          question.difficulty === DifficultyLevel.EASY
+                            ? "green"
+                            : question.difficulty === DifficultyLevel.MEDIUM
+                              ? "orange"
+                              : "red"
+                        }
+                      >
                         {formatDifficulty(question.difficulty)}
                       </Tag>,
-                      <Tag key="score">{question.score}分</Tag>
+                      <Tag key="score">{question.score}分</Tag>,
                     ]}
                   >
                     <List.Item.Meta
@@ -603,9 +651,16 @@ const ExamPaperManagement: React.FC = () => {
                           checked={selectedQuestions.includes(question.id)}
                           onChange={(e) => {
                             if (e.target.checked) {
-                              setSelectedQuestions([...selectedQuestions, question.id]);
+                              setSelectedQuestions([
+                                ...selectedQuestions,
+                                question.id,
+                              ]);
                             } else {
-                              setSelectedQuestions(selectedQuestions.filter(id => id !== question.id));
+                              setSelectedQuestions(
+                                selectedQuestions.filter(
+                                  (id) => id !== question.id,
+                                ),
+                              );
                             }
                           }}
                         />
@@ -613,8 +668,10 @@ const ExamPaperManagement: React.FC = () => {
                       title={question.content}
                       description={
                         <Space wrap>
-                          {question.tags?.map(tag => (
-                            <Tag key={tag} color="cyan">{tag}</Tag>
+                          {question.tags?.map((tag) => (
+                            <Tag key={tag} color="cyan">
+                              {tag}
+                            </Tag>
                           ))}
                         </Space>
                       }
@@ -624,10 +681,14 @@ const ExamPaperManagement: React.FC = () => {
               />
             </div>
 
-            <Form.Item style={{ marginTop: 24, textAlign: 'right' }}>
+            <Form.Item style={{ marginTop: 24, textAlign: "right" }}>
               <Space>
-                <Button onClick={() => setCreateModalVisible(false)}>取消</Button>
-                <Button type="primary" htmlType="submit">创建试卷</Button>
+                <Button onClick={() => setCreateModalVisible(false)}>
+                  取消
+                </Button>
+                <Button type="primary" htmlType="submit">
+                  创建试卷
+                </Button>
               </Space>
             </Form.Item>
           </Form>
@@ -641,7 +702,7 @@ const ExamPaperManagement: React.FC = () => {
         footer={[
           <Button key="close" onClick={() => setDetailModalVisible(false)}>
             关闭
-          </Button>
+          </Button>,
         ]}
         width={800}
       >
@@ -651,22 +712,40 @@ const ExamPaperManagement: React.FC = () => {
               <Title level={4}>{selectedPaper.name}</Title>
               <Row gutter={16}>
                 <Col span={6}>
-                  <p><strong>总分:</strong> {selectedPaper.totalScore}分</p>
+                  <p>
+                    <strong>总分:</strong> {selectedPaper.totalScore}分
+                  </p>
                 </Col>
                 <Col span={6}>
-                  <p><strong>及格分:</strong> {selectedPaper.passingScore}分</p>
+                  <p>
+                    <strong>及格分:</strong> {selectedPaper.passingScore}分
+                  </p>
                 </Col>
                 <Col span={6}>
-                  <p><strong>时长:</strong> {formatDuration(selectedPaper.duration)}</p>
+                  <p>
+                    <strong>时长:</strong>{" "}
+                    {formatDuration(selectedPaper.duration)}
+                  </p>
                 </Col>
                 <Col span={6}>
-                  <p><strong>题目数:</strong> {selectedPaper.examQuestions?.length || 0}题</p>
+                  <p>
+                    <strong>题目数:</strong>{" "}
+                    {selectedPaper.examQuestions?.length || 0}题
+                  </p>
                 </Col>
               </Row>
-              <p><strong>考试时间:</strong> {formatDateTime(selectedPaper.startTime)} ~ {formatDateTime(selectedPaper.endTime)}</p>
+              <p>
+                <strong>考试时间:</strong>{" "}
+                {formatDateTime(selectedPaper.startTime)} ~{" "}
+                {formatDateTime(selectedPaper.endTime)}
+              </p>
               <Space>
-                {selectedPaper.shuffleQuestions && <Tag color="blue">乱序出题</Tag>}
-                {selectedPaper.shuffleOptions && <Tag color="orange">乱序选项</Tag>}
+                {selectedPaper.shuffleQuestions && (
+                  <Tag color="blue">乱序出题</Tag>
+                )}
+                {selectedPaper.shuffleOptions && (
+                  <Tag color="orange">乱序选项</Tag>
+                )}
               </Space>
             </Card>
 
@@ -680,9 +759,16 @@ const ExamPaperManagement: React.FC = () => {
                   size="small"
                   style={{ marginBottom: 12 }}
                 >
-                  <div style={{ display: 'flex', alignItems: 'flex-start' }}>
-                    <Tag style={{ marginRight: 8 }}>{formatQuestionType(examQuestion.question.type)}</Tag>
-                    <Tag color={getDifficultyColor(examQuestion.question.difficulty)} style={{ marginRight: 8 }}>
+                  <div style={{ display: "flex", alignItems: "flex-start" }}>
+                    <Tag style={{ marginRight: 8 }}>
+                      {formatQuestionType(examQuestion.question.type)}
+                    </Tag>
+                    <Tag
+                      color={getDifficultyColor(
+                        examQuestion.question.difficulty,
+                      )}
+                      style={{ marginRight: 8 }}
+                    >
                       {formatDifficulty(examQuestion.question.difficulty)}
                     </Tag>
                     <Tag>{examQuestion.question.score}分</Tag>
@@ -693,8 +779,10 @@ const ExamPaperManagement: React.FC = () => {
                   </p>
                   {examQuestion.question.tags?.length > 0 && (
                     <Space wrap>
-                      {examQuestion.question.tags.map(tag => (
-                        <Tag key={tag} color="cyan">{tag}</Tag>
+                      {examQuestion.question.tags.map((tag) => (
+                        <Tag key={tag} color="cyan">
+                          {tag}
+                        </Tag>
                       ))}
                     </Space>
                   )}

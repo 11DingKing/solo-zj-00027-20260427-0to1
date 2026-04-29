@@ -91,6 +91,7 @@ export interface ExamAnswer {
   teacherScore?: number;
   teacherComment?: string;
   answeredAt: string;
+  question?: Question;
 }
 
 export interface ExamResult {

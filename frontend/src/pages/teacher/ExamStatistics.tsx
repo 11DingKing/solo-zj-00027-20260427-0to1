@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   Card,
   Select,
@@ -8,11 +8,9 @@ import {
   Table,
   Tag,
   Typography,
-  Button,
-  Space,
   message,
-  Spin
-} from 'antd';
+  Spin,
+} from "antd";
 import {
   BarChart,
   Bar,
@@ -26,13 +24,12 @@ import {
   PolarGrid,
   PolarAngleAxis,
   PolarRadiusAxis,
-  Radar
-} from 'recharts';
-import type { ColumnsType } from 'antd/es/table';
+  Radar,
+} from "recharts";
+import type { ColumnsType } from "antd/es/table";
 
-import { apiService } from '@/services/api';
-import { ExamPaper, ExamStats, QuestionStat, TagStat, ScoreDistribution } from '@/types';
-import { formatQuestionType } from '@/utils/format';
+import { apiService } from "@/services/api";
+import { ExamPaper, ExamStats, QuestionStat } from "@/types";
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -54,7 +51,7 @@ const ExamStatistics: React.FC = () => {
       const result = await apiService.getExamPapers();
       setExamPapers(result);
     } catch (error) {
-      message.error('获取试卷列表失败');
+      message.error("获取试卷列表失败");
     } finally {
       setLoading(false);
     }
@@ -66,7 +63,7 @@ const ExamStatistics: React.FC = () => {
       const result = await apiService.getExamStats(examId);
       setStats(result);
     } catch (error) {
-      message.error('获取统计数据失败');
+      message.error("获取统计数据失败");
     } finally {
       setFetchingStats(false);
     }
@@ -79,52 +76,77 @@ const ExamStatistics: React.FC = () => {
 
   const questionColumns: ColumnsType<QuestionStat> = [
     {
-      title: '题号',
-      dataIndex: 'questionId',
-      key: 'questionId',
-      width: 80
+      title: "题号",
+      dataIndex: "questionId",
+      key: "questionId",
+      width: 80,
     },
     {
-      title: '题干',
-      dataIndex: 'questionContent',
-      key: 'questionContent',
-      ellipsis: true
+      title: "题干",
+      dataIndex: "questionContent",
+      key: "questionContent",
+      ellipsis: true,
     },
     {
-      title: '作答人数',
-      dataIndex: 'totalAttempts',
-      key: 'totalAttempts'
+      title: "作答人数",
+      dataIndex: "totalAttempts",
+      key: "totalAttempts",
     },
     {
-      title: '正确人数',
-      dataIndex: 'correctCount',
-      key: 'correctCount'
+      title: "正确人数",
+      dataIndex: "correctCount",
+      key: "correctCount",
     },
     {
-      title: '正确率',
-      key: 'correctRate',
+      title: "正确率",
+      key: "correctRate",
       render: (_, record) => (
-        <Tag color={record.correctRate >= 0.7 ? 'green' : record.correctRate >= 0.4 ? 'orange' : 'red'}>
+        <Tag
+          color={
+            record.correctRate >= 0.7
+              ? "green"
+              : record.correctRate >= 0.4
+                ? "orange"
+                : "red"
+          }
+        >
           {(record.correctRate * 100).toFixed(1)}%
         </Tag>
-      )
+      ),
     },
     {
-      title: '区分度',
-      key: 'discrimination',
+      title: "区分度",
+      key: "discrimination",
       render: (_, record) => (
-        <Tag color={record.discrimination >= 0.4 ? 'green' : record.discrimination >= 0.2 ? 'blue' : 'orange'}>
+        <Tag
+          color={
+            record.discrimination >= 0.4
+              ? "green"
+              : record.discrimination >= 0.2
+                ? "blue"
+                : "orange"
+          }
+        >
           {record.discrimination.toFixed(2)}
         </Tag>
-      )
-    }
+      ),
+    },
   ];
 
   return (
     <div>
       <Card>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-          <Title level={4} style={{ margin: 0 }}>成绩统计</Title>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: 24,
+          }}
+        >
+          <Title level={4} style={{ margin: 0 }}>
+            成绩统计
+          </Title>
           <Select
             placeholder="请选择试卷"
             style={{ width: 300 }}
@@ -133,7 +155,7 @@ const ExamStatistics: React.FC = () => {
             value={selectedExamId}
             allowClear
           >
-            {examPapers.map(paper => (
+            {examPapers.map((paper) => (
               <Option key={paper.id} value={paper.id}>
                 {paper.name}
               </Option>
@@ -142,11 +164,11 @@ const ExamStatistics: React.FC = () => {
         </div>
 
         {!selectedExamId ? (
-          <div style={{ textAlign: 'center', padding: 100 }}>
+          <div style={{ textAlign: "center", padding: 100 }}>
             <p>请选择试卷查看统计数据</p>
           </div>
         ) : fetchingStats ? (
-          <div style={{ textAlign: 'center', padding: 100 }}>
+          <div style={{ textAlign: "center", padding: 100 }}>
             <Spin size="large" />
           </div>
         ) : stats ? (
@@ -159,7 +181,7 @@ const ExamStatistics: React.FC = () => {
                     value={stats.avgScore}
                     precision={1}
                     suffix="分"
-                    valueStyle={{ color: '#1890ff' }}
+                    valueStyle={{ color: "#1890ff" }}
                   />
                 </Card>
               </Col>
@@ -169,7 +191,7 @@ const ExamStatistics: React.FC = () => {
                     title="最高分"
                     value={stats.maxScore}
                     suffix="分"
-                    valueStyle={{ color: '#52c41a' }}
+                    valueStyle={{ color: "#52c41a" }}
                   />
                 </Card>
               </Col>
@@ -179,7 +201,7 @@ const ExamStatistics: React.FC = () => {
                     title="最低分"
                     value={stats.minScore}
                     suffix="分"
-                    valueStyle={{ color: '#ff4d4f' }}
+                    valueStyle={{ color: "#ff4d4f" }}
                   />
                 </Card>
               </Col>
@@ -189,7 +211,7 @@ const ExamStatistics: React.FC = () => {
                     title="参考人数"
                     value={stats.totalStudents}
                     suffix="人"
-                    valueStyle={{ color: '#722ed1' }}
+                    valueStyle={{ color: "#722ed1" }}
                   />
                 </Card>
               </Col>
@@ -237,7 +259,7 @@ const ExamStatistics: React.FC = () => {
                 rowKey="questionId"
                 pagination={{
                   pageSize: 10,
-                  showTotal: (total) => `共 ${total} 题`
+                  showTotal: (total) => `共 ${total} 题`,
                 }}
               />
             </Card>
