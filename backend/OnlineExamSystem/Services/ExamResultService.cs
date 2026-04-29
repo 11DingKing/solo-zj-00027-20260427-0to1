@@ -242,6 +242,7 @@ public class ExamResultService : IExamResultService
                 eq.ExamPaperId,
                 eq.QuestionId,
                 eq.QuestionOrder,
+                eq.Score,
                 eq.Question != null ? new QuestionDTO(
                     eq.Question.Id,
                     eq.Question.Type,

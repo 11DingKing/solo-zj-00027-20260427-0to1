@@ -334,6 +334,7 @@ public class ExamService : IExamService
                 eq.ExamPaperId,
                 eq.QuestionId,
                 eq.QuestionOrder,
+                eq.Score,
                 eq.Question != null ? new QuestionDTO(
                     eq.Question.Id,
                     eq.Question.Type,

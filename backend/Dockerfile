@@ -1,8 +1,9 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
+COPY nuget.config .
 COPY ["OnlineExamSystem/OnlineExamSystem.csproj", "OnlineExamSystem/"]
-RUN dotnet restore "OnlineExamSystem/OnlineExamSystem.csproj"
+RUN dotnet restore "OnlineExamSystem/OnlineExamSystem.csproj" --configfile nuget.config
 
 COPY . .
 WORKDIR "/src/OnlineExamSystem"

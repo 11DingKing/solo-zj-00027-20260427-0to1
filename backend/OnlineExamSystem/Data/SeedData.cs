@@ -368,7 +368,7 @@ public static class SeedData
 
     private static void SetCorrectAnswer(Question question)
     {
-        var correctOption = question.Options.FirstOrDefault(o => o.IsCorrect);
+        var correctOption = question.Options.FirstOrDefault(o => o.IsCorrect == true);
         if (correctOption != null)
         {
             question.CorrectAnswer = correctOption.Id.ToString();
@@ -377,7 +377,7 @@ public static class SeedData
 
     private static void SetMultiChoiceCorrectAnswer(Question question)
     {
-        var correctOptions = question.Options.Where(o => o.IsCorrect).OrderBy(o => o.OptionOrder).ToList();
+        var correctOptions = question.Options.Where(o => o.IsCorrect == true).OrderBy(o => o.OptionOrder).ToList();
         if (correctOptions.Any())
         {
             var correctIds = correctOptions.Select(o => o.Id.ToString()).ToArray();
