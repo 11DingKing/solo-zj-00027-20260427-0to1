@@ -33,7 +33,7 @@ services:
       - Cors__AllowedOrigins__0=http://localhost:8080
       - Cors__AllowedOrigins__1=http://frontend:80
     ports:
-      - "5000:5000"
+      - "5001:5000"
     networks:
       - online_exam_network
     depends_on:

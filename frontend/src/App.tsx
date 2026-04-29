@@ -10,7 +10,7 @@ import {
 } from "@ant-design/icons";
 import type { MenuProps } from "antd";
 
-import { UserRole } from "@/types";
+import { UserRole, LoginRequest } from "@/types";
 import { useAuth } from "@/hooks/useAuth";
 import LoginPage from "@/pages/LoginPage";
 import QuestionManagement from "@/pages/teacher/QuestionManagement";
@@ -29,7 +29,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isTeacher: boolean;
   isStudent: boolean;
-  login: (username: string, password: string, role: UserRole) => Promise<void>;
+  login: (credentials: LoginRequest) => Promise<void>;
   logout: () => void;
   loading: boolean;
 }

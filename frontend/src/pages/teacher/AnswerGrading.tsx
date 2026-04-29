@@ -19,7 +19,6 @@ import { ArrowLeftOutlined } from "@ant-design/icons";
 
 import { apiService } from "@/services/api";
 import { ExamAnswer, ExamResult } from "@/types";
-import { getDifficultyColor } from "@/utils/format";
 
 const { Title, Text } = Typography;
 const { TextArea } = Input;
@@ -30,7 +29,6 @@ const AnswerGrading: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [answers, setAnswers] = useState<ExamAnswer[]>([]);
   const [examResult, setExamResult] = useState<ExamResult | null>(null);
-  const [form] = Form.useForm();
 
   useEffect(() => {
     if (sessionId) {

@@ -23,7 +23,6 @@ import {
 } from "antd";
 import {
   PlusOutlined,
-  EditOutlined,
   DeleteOutlined,
   FileTextOutlined,
   BarChartOutlined,

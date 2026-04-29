@@ -135,7 +135,7 @@ using (var scope = app.Services.CreateScope())
     var userManager = services.GetRequiredService<UserManager<User>>();
     var roleManager = services.GetRequiredService<RoleManager<IdentityRole<int>>>();
     
-    context.Database.Migrate();
+    context.Database.EnsureCreated();
     
     await SeedData.InitializeAsync(context, userManager, roleManager);
 }
